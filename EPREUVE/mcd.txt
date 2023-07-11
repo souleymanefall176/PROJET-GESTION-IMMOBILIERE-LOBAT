@@ -1,0 +1,51 @@
++---------------------+       +-------------------+
+|       Bailleur      |       |      Location     |
++---------------------+       +-------------------+
+| id                  |       | id                |
+| nom                 |       | libelle           |
+| prenom              |       | adresse           |
+| adresse             |       | type              |
+| tel                 |       | prix              |
+| CIN                 |       | id_bailleur       |
++---------------------+       +-------------------+
+         |                             |
+         |                             |
+         |                             |
+         v                             v
++---------------------+       +-------------------+
+|       Client        |       |      Contrat      |
++---------------------+       +-------------------+
+| id                  |       | id                |
+| nom                 |       | date_DEB          |
+| prenom              |       | date_FIN          |
+| tel                 |       | modePaiement      |
+| email               |       | id_client         |
+| CIN                 |       | id_location       |
+| id_gestionnaire     |       +-------------------+
++---------------------+
+         |
+         |
+         |
+         v
++---------------------+
+|       Paiement      |
++---------------------+
+| id                  |
+| date_paiement       |
+| id_contrat          |
+| id_gestionnaire     |
++---------------------+
+
+
++---------------------+
+|       Utilisateur   |
++---------------------+
+| id                  |
+| nom                 |
+| prenom              |
+| login               |
+| password            |
+| email               |
+| typeUser            |
+| id_gestionnaire     |
++---------------------+
