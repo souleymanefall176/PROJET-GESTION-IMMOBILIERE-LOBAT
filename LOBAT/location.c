@@ -383,6 +383,7 @@ void afficherIdMenuModLocation(char idSelectionne[]) {
 
 //VERIFICATION FICHIER VIDE OU PAS DEBUT
 int verifFileBailleur(FILE* file){
+
     file=fopen("bailleur.bin","rb");
     if (file == NULL) {
         printf("Le fichier n'existe pas.\n");
@@ -401,4 +402,231 @@ int verifFileBailleur(FILE* file){
     } else {
         return 0;  // Le fichier n'est pas vide
     }
+}
+
+void trouverLocation(){
+
+     // Tableau pour stocker les clients
+    LOCATION locations[100];  // Tableau pour stocker les locations
+    FILE* file=NULL;
+    char chaine[20];
+    int choix;  // Nombre de clients lus
+    int nbLocations = 0;  // Nombre de locations lues
+    int nbLocationsDisponibles;
+    int locationsDisponiblesIndex[100];  // Index des locations disponibles
+    int choixLocation;
+
+    do{
+        choixAdmin5();
+        printf("Choix : ");
+        choix=verifInt(chaine);
+    }while(choix<0 || choix>3);
+
+    switch(choix){
+        case 1:
+            // Lire les locations depuis le fichier location.bin
+            file = fopen("location.bin", "rb");
+            if (file == NULL) {
+                printf("Erreur lors de l'ouverture du fichier location.bin.\n");
+                return;
+            }
+
+            while (fread(&locations[nbLocations], sizeof(LOCATION), 1, file) == 1) {
+                if(strcasecmp(locations[nbLocations].typeLogement,"maison")==0){
+                    nbLocations++;
+                }
+            }
+            fclose(file);
+            // Parcourir les locations pour vérifier si elles ont un contrat
+            nbLocationsDisponibles = 0;  // Nombre de locations disponibles
+
+            for (int i = 0; i < nbLocations; i++) {
+                int locationDejaLouee = 0;
+                // Comparer l'ID de la location avec les IDs présents dans le fichier contrat.bin
+                file = fopen("contrat.bin", "rb");
+                if (file != NULL) {
+                    CONTRAT contrat;
+                    while (fread(&contrat, sizeof(CONTRAT), 1, file) == 1) {
+                        if (strcmp(contrat.idLocation, locations[i].id) == 0 && strcasecmp(locations[i].typeLogement,"maison")==0) {
+                            locationDejaLouee = 1;
+                            break;
+                        }
+                    }
+                    fclose(file);
+                }
+                if (!locationDejaLouee) {
+                    locationsDisponiblesIndex[nbLocationsDisponibles] = i;
+                    nbLocationsDisponibles++;
+                }
+            }
+            // Vérifier s'il y a des locations disponibles
+            if (nbLocationsDisponibles == 0) {
+                printf("Aucune location de type maison disponible.\n");
+                Sleep(2000);
+                system("cls");
+                accueilAdministrateur();
+                return;
+            }
+            // Afficher les ID des locations disponibles
+            printf("Liste des locations disponibles :\n");
+            for (int i = 0; i < nbLocationsDisponibles; i++) {
+                if(strcasecmp(locations[locationsDisponiblesIndex[i]].typeLogement,"maison")==0){
+                    printf("%d. %s\n", i + 1, locations[locationsDisponiblesIndex[i]].id);
+                    printf("\tLibelle %s\n\tType Logement : %s\n\tAdresse : %s %s %s %s\n\tPrix : %f\n",locations[locationsDisponiblesIndex[i]].libelle,locations[locationsDisponiblesIndex[i]].typeLogement,locations[locationsDisponiblesIndex[i]].adresse.pays,locations[locationsDisponiblesIndex[i]].adresse.region,locations[locationsDisponiblesIndex[i]].adresse.departement,locations[locationsDisponiblesIndex[i]].adresse.commune,locations[locationsDisponiblesIndex[i]].prix);
+                }
+
+            }
+            printf("\n");
+            // Demander à l'utilisateur de choisir une location
+
+            printf("0 pour quitter : ");
+            scanf("%d", &choixLocation);
+            // Vérifier si l'utilisateur a choisi de quitter
+            if (choixLocation == 0) {
+                Sleep(2000);
+                system("cls");
+                accueilAdministrateur();
+                return;
+            }
+
+        break;
+        case 2:
+
+            // Lire les locations depuis le fichier location.bin
+            file = fopen("location.bin", "rb");
+            if (file == NULL) {
+                printf("Erreur lors de l'ouverture du fichier location.bin.\n");
+                return;
+            }
+
+            while (fread(&locations[nbLocations], sizeof(LOCATION), 1, file) == 1) {
+                if(strcasecmp(locations[nbLocations].typeLogement,"appartement")==0){
+                    nbLocations++;
+                }
+            }
+            fclose(file);
+            // Parcourir les locations pour vérifier si elles ont un contrat
+            nbLocationsDisponibles = 0;  // Nombre de locations disponibles
+            for (int i = 0; i < nbLocations; i++) {
+                int locationDejaLouee = 0;
+                // Comparer l'ID de la location avec les IDs présents dans le fichier contrat.bin
+                file = fopen("contrat.bin", "rb");
+                if (file != NULL) {
+                    CONTRAT contrat;
+                    while (fread(&contrat, sizeof(CONTRAT), 1, file) == 1) {
+                        if (strcmp(contrat.idLocation, locations[i].id) == 0 && strcasecmp(locations[i].typeLogement,"appartement")==0) {
+                            locationDejaLouee = 1;
+                            break;
+                        }
+                    }
+                    fclose(file);
+                }
+                if (!locationDejaLouee) {
+                    locationsDisponiblesIndex[nbLocationsDisponibles] = i;
+                    nbLocationsDisponibles++;
+                }
+            }
+            // Vérifier s'il y a des locations disponibles
+            if (nbLocationsDisponibles == 0) {
+                printf("Aucune location de type appartement disponible .\n");
+                Sleep(2000);
+                system("cls");
+                accueilAdministrateur();
+                return;
+            }
+            // Afficher les ID des locations disponibles
+            printf("Liste des locations disponibles :\n");
+            for (int i = 0; i < nbLocationsDisponibles; i++) {
+                if(strcasecmp(locations[locationsDisponiblesIndex[i]].typeLogement,"appartement")==0){
+                    printf("%d. %s\n", i + 1, locations[locationsDisponiblesIndex[i]].id);
+                    printf("\tLibelle %s\n\tType Logement : %s\n\tAdresse : %s %s %s %s\n\tPrix : %f\n",locations[locationsDisponiblesIndex[i]].libelle,locations[locationsDisponiblesIndex[i]].typeLogement,locations[locationsDisponiblesIndex[i]].adresse.pays,locations[locationsDisponiblesIndex[i]].adresse.region,locations[locationsDisponiblesIndex[i]].adresse.departement,locations[locationsDisponiblesIndex[i]].adresse.commune,locations[locationsDisponiblesIndex[i]].prix);
+                }
+
+            }
+            printf("\n");
+            // Demander à l'utilisateur de choisir une location
+
+            printf("0 pour quitter : ");
+            scanf("%d", &choixLocation);
+            // Vérifier si l'utilisateur a choisi de quitter
+            if (choixLocation == 0) {
+                Sleep(2000);
+                system("cls");
+                accueilAdministrateur();
+                return;
+            }
+        break;
+        case 3:
+
+            // Lire les locations depuis le fichier location.bin
+            file = fopen("location.bin", "rb");
+            if (file == NULL) {
+                printf("Erreur lors de l'ouverture du fichier location.bin.\n");
+                return;
+            }
+
+            while (fread(&locations[nbLocations], sizeof(LOCATION), 1, file) == 1) {
+                if(strcasecmp(locations[nbLocations].typeLogement,"studio")==0){
+                    nbLocations++;
+                }
+            }
+            fclose(file);
+            // Parcourir les locations pour vérifier si elles ont un contrat
+            nbLocationsDisponibles = 0;  // Nombre de locations disponibles
+            for (int i = 0; i < nbLocations; i++) {
+                int locationDejaLouee = 0;
+                // Comparer l'ID de la location avec les IDs présents dans le fichier contrat.bin
+                file = fopen("contrat.bin", "rb");
+                if (file != NULL) {
+                    CONTRAT contrat;
+                    while (fread(&contrat, sizeof(CONTRAT), 1, file) == 1) {
+                        if (strcmp(contrat.idLocation, locations[i].id) == 0 && strcasecmp(locations[i].typeLogement,"studio")==0) {
+                            locationDejaLouee = 1;
+                            break;
+                        }
+                    }
+                    fclose(file);
+                }
+                if (!locationDejaLouee) {
+                    locationsDisponiblesIndex[nbLocationsDisponibles] = i;
+                    nbLocationsDisponibles++;
+                }
+            }
+            // Vérifier s'il y a des locations disponibles
+            if (nbLocationsDisponibles == 0) {
+                printf("Aucune location de type studio disponible.\n");
+                Sleep(2000);
+                system("cls");
+                accueilAdministrateur();
+                return;
+            }
+            // Afficher les ID des locations disponibles
+            printf("Liste des locations disponibles :\n");
+            for (int i = 0; i < nbLocationsDisponibles; i++) {
+                if(strcasecmp(locations[locationsDisponiblesIndex[i]].typeLogement,"studio")==0){
+                    printf("%d. %s\n", i + 1, locations[locationsDisponiblesIndex[i]].id);
+                    printf("\tLibelle %s\n\tType Logement : %s\n\tAdresse : %s %s %s %s\n\tPrix : %f\n",locations[locationsDisponiblesIndex[i]].libelle,locations[locationsDisponiblesIndex[i]].typeLogement,locations[locationsDisponiblesIndex[i]].adresse.pays,locations[locationsDisponiblesIndex[i]].adresse.region,locations[locationsDisponiblesIndex[i]].adresse.departement,locations[locationsDisponiblesIndex[i]].adresse.commune,locations[locationsDisponiblesIndex[i]].prix);
+                }
+
+            }
+            printf("\n");
+            // Demander à l'utilisateur de choisir une location
+
+            printf("0 pour quitter : ");
+            scanf("%d", &choixLocation);
+            // Vérifier si l'utilisateur a choisi de quitter
+            if (choixLocation == 0) {
+                Sleep(2000);
+                system("cls");
+                accueilAdministrateur();
+                return;
+            }
+        break;
+        default:
+            Sleep(2000);
+            system("cls");
+            accueilAdministrateur();
+    }
+
+
 }

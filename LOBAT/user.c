@@ -34,6 +34,8 @@ void inscription(){
         gets(user.password);//à hacher
 
     }while(verifierMotDePasse(user.password)!=0);
+    chiffrer(user.password,decalage);
+    printf("PassWord %s\n",user.password);
     do{
         fflush(stdin);
         printf("Tel : ");
@@ -317,6 +319,153 @@ int verifUniciteMailUser(char mail[], char id[]) {
 
   fclose(file);
   return 0;
+}
+void trouverUser(){
+    FILE* file=NULL;
+    char chaine[20],login[50],mail[75];
+    int choix,index=0,choixQuit;
+    USER u;
+
+    do{
+        choixAdmin5();
+        printf("Choix : ");
+        choix=verifInt(chaine);
+    }while(choix<0 || choix>2);
+
+    switch(choix){
+        case 1:
+            do{
+                fflush(stdin);
+                printf("Email : ");
+                gets(mail);
+                if(verifMail(mail)!=0){
+                    puts("Adresse Mail incorrecte");
+                }
+
+            }while(verifMail(mail)!=0);
+            file = fopen("user.bin", "rb");
+            if (file == NULL) {
+                printf("Erreur lors de l'ouverture du fichier user.bin.\n");
+                Sleep(2000);
+                system("cls");
+                accueilAdministrateur();
+                return;
+            }
+
+            while (fread(&u, sizeof(USER), 1, file) == 1) {
+                if(strcmp(u.email,mail)==0){
+                    index++;
+                    printf("%d-%s\n",index,u.email);
+                    printf("\tID : %s\n\tNOM : %s\n\tPRENOM : %s\n\tLOGIN :%s\n\tTEL : %s\n\tTYPE USER : %s\n",u.id,u.nom,u.prenom,u.login,u.tel,u.typeUser);
+                }
+            }
+            fclose(file);
+
+            // Vérifier si l'utilisateur a choisi de quitter
+            if(index==0){
+                printf("Cet Email ne correspond a aucun utilisateur\n");
+                Sleep(2000);
+                system("cls");
+                accueilAdministrateur();
+
+            }
+            do{
+
+                printf("\t1- Modifier\n");
+                printf("\t2- Supprimer\n");
+                printf("\t0- Quitter\n");
+                printf("Choix : ");
+                scanf("%d", &choixQuit);
+
+            }while(choixQuit<0 || choixQuit>2);
+            switch(choixQuit){
+                case 1:
+                    modifierUtilisateur(u.login);
+                    Sleep(2000);
+                    system("cls");
+                    accueilAdministrateur();
+                    break;
+                case 2:
+                    supprimerUtilisateur(u.login);
+                    Sleep(2000);
+                    system("cls");
+                    accueilAdministrateur();
+                    break;
+                default:
+
+                    Sleep(2000);
+                    system("cls");
+                    accueilAdministrateur();
+            }
+            break;
+        case 2:
+            do{
+                fflush(stdin);
+                printf("Login : ");
+                gets(login);
+            }while(strlen(login)>49);
+            file = fopen("user.bin", "rb");
+            if (file == NULL) {
+                printf("Erreur lors de l'ouverture du fichier user.bin.\n");
+                Sleep(2000);
+                system("cls");
+                accueilAdministrateur();
+                return;
+            }
+
+            while (fread(&u, sizeof(USER), 1, file) == 1) {
+                if(strcmp(u.login,login)==0){
+                    index++;
+                    printf("%d-%s\n",index,u.login);
+                    printf("\tID : %s\n\tNOM : %s\n\tPRENOM : %s\n\tEMAIL :%s\n\tTEL : %s\n\tTYPE USER : %s\n",u.id,u.nom,u.prenom,u.email,u.tel,u.typeUser);
+                }
+            }
+            fclose(file);
+
+            // Vérifier si l'utilisateur a choisi de quitter
+            if(index==0){
+                printf("Ce Login ne correspond a aucun utilisateur\n");
+                Sleep(2000);
+                system("cls");
+                accueilAdministrateur();
+
+            }
+            do{
+
+                printf("\t1- Modifier\n");
+                printf("\t2- Supprimer\n");
+                printf("\t0- Quitter\n");
+                printf("Choix : ");
+                scanf("%d", &choixQuit);
+            }while(choixQuit<0 || choixQuit>2);
+            switch(choixQuit){
+                case 1:
+
+                    modifierUtilisateur(u.login);
+                    Sleep(2000);
+                    system("cls");
+                    accueilAdministrateur();
+                    break;
+                case 2:
+
+                    supprimerUtilisateur(u.login);
+                    Sleep(2000);
+                    system("cls");
+                    accueilAdministrateur();
+                    break;
+                default:
+                    Sleep(2000);
+                    system("cls");
+                    accueilAdministrateur();
+            }
+            break;
+        default:
+            Sleep(2000);
+            system("cls");
+            accueilAdministrateur();
+
+
+    }
 }
 
 

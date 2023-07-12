@@ -628,85 +628,118 @@ void afficher_informations_contrats() {
 }*/
 
 
-void afficherContratClient() {
+void rechercherContrats() {
+    int choix;
+    char chaine[2];
+    do{
+        printf("Choisissez le critere de recherche :\n");
+        printf("1. Rechercher par client\n");
+        printf("2. Rechercher par location\n");
+        printf("Votre choix : ");
+        choix=verifInt(chaine);
+    }while(choix<1 || choix>2);
+
     FILE* fichierContrats = fopen("contrat.bin", "rb");
-    FILE* fichierClients = fopen("client.bin", "rb");
-
-    if (fichierContrats == NULL || fichierClients == NULL) {
-        printf("Erreur lors de l'ouverture des fichiers.\n");
-        Sleep(2000);
-        system("cls");
-        accueilAdministrateur();
+    if (fichierContrats == NULL) {
+        printf("Erreur lors de l'ouverture du fichier contrat.bin\n");
         return;
     }
 
-    // Lire le nombre de clients et de contrats dans les fichiers
-    int nbClients, nbContrats;
-    fread(&nbClients, sizeof(int), 1, fichierClients);
-    fread(&nbContrats, sizeof(int), 1, fichierContrats);
+    CONTRAT contrat;
+    CLIENT client;
+    LOCATION location;
 
-    if (nbClients == 0 || nbContrats == 0) {
-        printf("Aucun client ou contrat trouvé.\n");
-        Sleep(2000);
-        system("cls");
-        accueilAdministrateur();
-        fclose(fichierContrats);
-        fclose(fichierClients);
-        return;
+    switch (choix) {
+        case 1:
+            printf("Entrez l'ID du client : ");
+            char idClient[20];
+            scanf("%s", idClient);
+
+            FILE* fichierClients = fopen("client.bin", "rb");
+            if (fichierClients == NULL) {
+                printf("Erreur lors de l'ouverture du fichier client.bin\n");
+                Sleep(2000);
+                system("cls");
+                fclose(fichierContrats);
+                return;
+            }
+            int index=0;
+            while (fread(&client, sizeof(CLIENT), 1, fichierClients) == 1) {
+                if (strcmp(client.id, idClient) == 0) {
+                    rewind(fichierContrats);
+                    while (fread(&contrat, sizeof(CONTRAT), 1, fichierContrats) == 1) {
+                        if (strcmp(contrat.idClient, idClient) == 0) {
+                            printf("Contrat ID: %s\n", contrat.id);
+                            printf("Location ID: %s\n", contrat.idLocation);
+                            printf("Gestionnaire ID: %s\n", contrat.idGestionnaire);
+                            printf("Client ID: %s\n", contrat.idClient);
+                            printf("Mode Paiement ID: %s\n", contrat.modePaiement);
+                            printf("Date Debut: %d/%d/%d\n", contrat.date_DEB.jours,contrat.date_DEB.mois,contrat.date_DEB.annee);
+                            printf("Date Fin: %d/%d/%d\n", contrat.date_FIN.jours,contrat.date_FIN.mois,contrat.date_FIN.annee);
+                            index=1;
+                            Sleep(2000);
+                            system("cls");
+                        }
+                    }
+                    if(index==0){
+                        printf("Aucun contrat\n");
+                        Sleep(2000);
+                        system("cls");
+                        accueilGestionnaire();
+                    }
+                    break;
+                }
+            }
+
+            fclose(fichierClients);
+            break;
+
+        case 2:
+            printf("Entrez l'ID de la location : ");
+            char idLocation[20];
+            scanf("%s", idLocation);
+
+            FILE* fichierLocations = fopen("location.bin", "rb");
+            if (fichierLocations == NULL) {
+                printf("Erreur lors de l'ouverture du fichier location.bin\n");
+                fclose(fichierContrats);
+                return;
+            }
+            index=0;
+            while (fread(&location, sizeof(LOCATION), 1, fichierLocations) == 1) {
+                if (strcmp(location.id, idLocation) == 0) {
+                    rewind(fichierContrats);
+                    while (fread(&contrat, sizeof(CONTRAT), 1, fichierContrats) == 1) {
+                        if (strcmp(contrat.idLocation, idLocation) == 0) {
+                            printf("Contrat ID: %s\n", contrat.id);
+                            printf("Location ID: %s\n", contrat.idLocation);
+                            printf("Gestionnaire ID: %s\n", contrat.idGestionnaire);
+                            printf("Client ID: %s\n", contrat.idClient);
+                            printf("Mode Paiement ID: %s\n", contrat.modePaiement);
+                            printf("Date Debut: %d/%d/%d\n", contrat.date_DEB.jours,contrat.date_DEB.mois,contrat.date_DEB.annee);
+                            printf("Date Fin: %d/%d/%d\n", contrat.date_FIN.jours,contrat.date_FIN.mois,contrat.date_FIN.annee);
+                            index=1;
+                            Sleep(2000);
+                            system("cls");
+                        }
+                    }
+                    if(index==0){
+                        printf("Aucun contrat\n");
+                        Sleep(2000);
+                        system("cls");
+                        accueilGestionnaire();
+                    }
+                    break;
+                }
+            }
+
+            fclose(fichierLocations);
+            break;
+
+        default:
+            printf("Choix invalide\n");
+            break;
     }
 
-    // Afficher la liste des clients disponibles
-    CLIENT* clients = (CLIENT*)malloc(nbClients * sizeof(CLIENT));
-    fread(clients, sizeof(CLIENT), nbClients, fichierClients);
-
-    printf("Liste des clients :\n");
-    for (int i = 0; i < nbClients; i++) {
-        printf("%d. %s\n", i + 1, clients[i].id);
-    }
-
-    // Demander à l'utilisateur de choisir l'index du client
-    int choixClient;
-    printf("Veuillez choisir l'index du client : ");
-    scanf("%d", &choixClient);
-
-    if (choixClient < 1 || choixClient > nbClients) {
-        printf("Index de client invalide.\n");
-        free(clients);
-        fclose(fichierContrats);
-        fclose(fichierClients);
-        return;
-    }
-
-    // Récupérer l'ID du client choisi
-    char idClient[20];
-    strcpy(idClient, clients[choixClient - 1].id);
-
-    // Afficher les informations du contrat lié au client
-    CONTRAT* contrats = (CONTRAT*)malloc(nbContrats * sizeof(CONTRAT));
-    fread(contrats, sizeof(CONTRAT), nbContrats, fichierContrats);
-
-    int contratTrouve = 0;
-
-    for (int i = 0; i < nbContrats; i++) {
-        if (strcmp(contrats[i].idClient, idClient) == 0) {
-            contratTrouve = 1;
-            printf("ID du contrat : %s\n", contrats[i].id);
-            printf("ID du contrat : %s\n", contrats[i].idClient);
-            printf("ID du contrat : %s\n", contrats[i].idGestionnaire);
-            printf("ID du contrat : %s\n", contrats[i].idLocation);
-            printf("ID du contrat : %d/%d/%d\n", contrats[i].date_DEB.jours,contrats[i].date_DEB.mois,contrats[i].date_DEB.annee);
-            printf("ID du contrat : %d/%d/%d\n", contrats[i].date_FIN.jours,contrats[i].date_FIN.mois,contrats[i].date_FIN.annee);
-            printf("ID du contrat : %s\n", contrats[i].modePaiement);
-            // Afficher les autres champs du contrat...
-        }
-    }
-
-    if (!contratTrouve) {
-        printf("Aucun contrat trouvé pour ce client.\n");
-    }
-
-    free(clients);
-    free(contrats);
     fclose(fichierContrats);
-    fclose(fichierClients);
 }

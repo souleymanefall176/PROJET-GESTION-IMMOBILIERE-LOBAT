@@ -1,6 +1,8 @@
 #ifndef LOBAT_H_INCLUDED
 #define LOBAT_H_INCLUDED
 
+#define TM 100
+#define decalage 10
 //====================DEFINITION DES STRUCTURES DEBUT====================
 char cpyIdGestionnaire[20];
 //ENUMERATION TYPELOGEMENT DEBUT
@@ -156,7 +158,6 @@ void choixAdmin2();
 void choixAdmin3();
 void choixAdmin4();
 void choixAdmin5();
-void choixAdmin6();
 //USER
 void supprimerUtilisateur(char[]);
 void modifierUtilisateur(char[]);
@@ -167,12 +168,14 @@ void afficherLoginsMenuModUser(char[]);
 void incrementerUser(int*);
 int verifUniciteMailUser(char[], char[]);
 int verifUniciteTelUser(char[], char[]);
+void trouverUser();
 //GESTIONNAIRE
 void accueilGestionnaire();
 void choixGestionnaire();
 void choixGestion1();
 void choixGestion2();
-
+void choixGestion3();
+void ListerInfos();
 
 //UTILISATEUR FIN
 //BAILLEUR DEBUT
@@ -195,6 +198,7 @@ void faireChoixLocation(char[]);
 void modifierLocation(char[] );
 void afficherIdMenuModLocation(char[]);
 void incrementerLocation(int*);
+void trouverLocation();
 
 //LOCATION FIN
 
@@ -219,18 +223,23 @@ int incrementerContrat();
 void afficher_informations_contrats();
 int menuPaiement();
 void afficherMenuContrat2();
+void afficherMenuContrat();
 void faireChoixContrat(char[]);
 void afficherIdMenuModContrat(char[]);//POUR AFFICHER TOUS LES CONTRATS
 void modifierContrat(char[] );
 void copieIdContrat(char[],char[],char[]);
+void rechercherContrats();
 
 //PAIEMENT
 int incrementerPaiement();
 void enregistrementPaiement();
 int verifierPaiementExistant(const char*, int, int);
 void afficheMenuContratAPayer(char[]);
-void afficherMenuContrat2();
 
+
+
+void dechiffrer(char*,int);
+void chiffrer(char*, int);
 //PROTOTYPE LOBAT FIN
 
 //=====================DEFINITION DES PROTOTYPES FIN=====================

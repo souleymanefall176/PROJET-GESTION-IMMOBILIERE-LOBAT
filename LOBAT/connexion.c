@@ -100,6 +100,8 @@ int connected(FILE* file, char login[],char password[]){
     fclose(file);
     return 0;
 }
+
+
 int verifTypeUser(FILE* file, char ch[]){
     file = fopen("user.bin", "rb");
     if (file == NULL) {
@@ -128,6 +130,7 @@ int connexion() {
     int connecte = 0;
     int isUserConnected;
 
+
     FILE* file = NULL;
     puts("============================== CONNEXION ==============================");
     puts("Pour acceder a nos services, veuillez vous connecter : ");
@@ -139,19 +142,25 @@ int connexion() {
         gets(login);
         printf("Mot de Passe : ");
         gets(password);
+        chiffrer(password,decalage);
 
         isUserConnected = connected(file, login, password);
-
         if (isUserConnected == 0) {
             puts("LOGIN ou MOT DE PASSE errone.");
             do {
                 fflush(stdin);
                 printf("Voulez vous reessayer (o/n) : ");
                 scanf("%c", &reponse);
-            } while (myLowerCase(reponse) != 'o' && myLowerCase(reponse) != 'n');
+            } while (reponse != 'o' && reponse != 'n' && reponse != 'O' && reponse != 'N');
 
-            if (reponse == 'n'){
+            if (reponse == 'n' || reponse == 'N'){
                 puts("Au revoir!!!");
+                Sleep(2000);
+                system("cls");
+
+
+
+                return 0;
             }
 
         } else if (isUserConnected == 1) {
@@ -168,7 +177,7 @@ int connexion() {
             system("cls");
         }
 
-    } while (isUserConnected == 0 && reponse == 'o');
+    } while (isUserConnected == 0 && (reponse == 'o' || reponse =='O'));
 
     return connecte;
 }
