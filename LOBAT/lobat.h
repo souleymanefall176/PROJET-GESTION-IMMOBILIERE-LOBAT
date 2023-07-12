@@ -98,6 +98,7 @@ typedef struct{
     DATES date_FIN;//parceque c'est vide au debut
     char modePaiement[7];//j'envisage de faire un menu l'utilisateurs aura le choix de choisir un entier et chaque valeur aura une reference en chaine de caractere
     int modifie; // Indicateur de modification
+
 }CONTRAT;
 //CONTRAT FIN
 
@@ -107,6 +108,7 @@ typedef struct{
     DATES datePaiement;
     char idContrat[20];
     char idGestionnaire[20];
+
 }PAIEMENT;
 //PAIENMENT DEBUT
 
@@ -152,6 +154,9 @@ void choixAdministrateur();
 void choixAdmin1();
 void choixAdmin2();
 void choixAdmin3();
+void choixAdmin4();
+void choixAdmin5();
+void choixAdmin6();
 //USER
 void supprimerUtilisateur(char[]);
 void modifierUtilisateur(char[]);
@@ -203,6 +208,7 @@ void incrementerClient(int*);
 int verifUniciteCINClient(char[],char[]);
 int verifUniciteTelClient(char[],char[]);
 int verifUniciteMailClient(char[],char[]);
+void afficherContratClient();
 
 //CLIENT FIN
 
@@ -212,17 +218,18 @@ void ajouterContrat2(char[]);
 int incrementerContrat();
 void afficher_informations_contrats();
 int menuPaiement();
-void afficherMenuContrat();
+void afficherMenuContrat2();
 void faireChoixContrat(char[]);
 void afficherIdMenuModContrat(char[]);//POUR AFFICHER TOUS LES CONTRATS
 void modifierContrat(char[] );
-void afficherMenuContrat2();//POUR AFFICHER UNIQUEMENT LES CONTRATS EN COURS
+void copieIdContrat(char[],char[],char[]);
 
 //PAIEMENT
 int incrementerPaiement();
-void copieIdContrat(char[],char[],char[]);
 void enregistrementPaiement();
 int verifierPaiementExistant(const char*, int, int);
+void afficheMenuContratAPayer(char[]);
+void afficherMenuContrat2();
 
 //PROTOTYPE LOBAT FIN
 

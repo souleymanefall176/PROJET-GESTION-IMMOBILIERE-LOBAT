@@ -221,6 +221,7 @@ void afficherMenuLocation() {
 
     while (fread(&loc, sizeof(LOCATION), 1, file) == 1) {
         printf("%d. %s\n", index, loc.id);
+        printf("\tLibelle %s\n\tType Logement : %s\n\tAdresse : %s %s %s %s\n\tPrix : %f\n",loc.libelle,loc.typeLogement,loc.adresse.pays,loc.adresse.region,loc.adresse.departement,loc.adresse.commune,loc.prix);
         index++;
     }
 

@@ -56,11 +56,10 @@ void enregistrementPaiement(){
 }*/
 void enregistrementPaiement() {
     PAIEMENT p;
-    char idSelectionneClient[20], idSelectionneContrat[20], nomFichier[50], nomFacture[50], idLocation[20];
+    char idSelectionneClient[20], idSelectionneContrat[20], nomFichier[50],nomFacture[50],idLocation[20];
     int pa = incrementerPaiement();
     int montantPaie;
     FILE* file = NULL;
-
     LOCATION l;
     // Récupérer la date du système
     time_t t = time(NULL);
@@ -78,6 +77,8 @@ void enregistrementPaiement() {
 
     // Vérifier si le paiement pour ce contrat et ce mois existe déjà
     if (verifierPaiementExistant(idSelectionneContrat, p.datePaiement.mois, p.datePaiement.annee)) {
+        Sleep(2000);
+        system("cls");
         printf("Un paiement pour ce contrat et ce mois existe deja. Le paiement ne peut etre enregistre.\n");
         Sleep(2000);
         system("cls");
@@ -87,36 +88,35 @@ void enregistrementPaiement() {
     strcpy(p.idContrat, idSelectionneContrat);
     sprintf(p.id, "P%d%d%d%d", p.datePaiement.jours, p.datePaiement.mois, p.datePaiement.annee, pa);
     printf("ID : %s\n", p.id);
-    sprintf(nomFacture, "FACTURE%d%d%d%d.txt", p.datePaiement.annee, p.datePaiement.mois, p.datePaiement.jours, pa);
-    file = fopen("location.bin", "rb");
+    sprintf(nomFacture,"FACTURE%d%d%d%d.txt",p.datePaiement.annee, p.datePaiement.mois, p.datePaiement.jours,pa);
+    file=fopen("location.bin","rb");
+
 
     while (fread(&l, sizeof(LOCATION), 1, file) == 1) {
-        if (strcmp(idLocation, l.id) == 0) {
-            montantPaie = l.prix;
+        if (strcmp(idLocation,l.id)==0) {
+            montantPaie=l.prix;
             break;
         }
     }
     fclose(file);
-    file = fopen(nomFacture, "a");
+    file=fopen(nomFacture,"a");
     if (file == NULL) {
         printf("Erreur lors de l'ouverture du fichier %s.\n", nomFichier);
-        Sleep(2000);
-        system("cls");
-        accueilAdministrateur();
         return;
     }
-    fprintf(file, "ID PAIEMENT : %s\nID CLIENT : %s \nMONTANT PAIEMENT : %d\nDATE PAIEMENT : %d/%d/%d\nID CONTRAT : %s\nID LOCATION : %s\nID GESTIONNAIRE : %s\n", p.id, idSelectionneClient, montantPaie, p.datePaiement.jours, p.datePaiement.mois, p.datePaiement.annee, p.idContrat, idLocation, p.idGestionnaire);
+    fprintf(file, "ID PAIEMENT : %s\nID CLIENT : %s \nMONTANT PAIEMENT : %d\nDATE PAIEMENT : %d/%d/%d\nID CONTRAT : %s\nID LOCATION : %s\nID GESTIONNAIRE : %s\n", p.id, idSelectionneClient, montantPaie, p.datePaiement.jours, p.datePaiement.mois, p.datePaiement.annee,p.idContrat,idLocation, p.idGestionnaire);
     fclose(file);
     sprintf(nomFichier, "%d%d%d_%s_%s.txt", p.datePaiement.annee, p.datePaiement.mois, p.datePaiement.jours, idSelectionneContrat, idSelectionneClient);
     printf("Nom : %s\n", nomFichier);
+    //recuperation du montant paiement
+
+
+
 
     // Fichier texte pour nomFichier
     file = fopen(nomFichier, "a");
     if (file == NULL) {
         printf("Erreur lors de l'ouverture du fichier %s.\n", nomFichier);
-        Sleep(2000);
-        system("cls");
-        accueilAdministrateur();
         return;
     }
     fprintf(file, "ID PAIEMENT : %s\nDATE PAIEMENT : %d/%d/%d\nID CONTRAT : %s\nID GESTIONNAIRE : %s\n", p.id, p.datePaiement.jours, p.datePaiement.mois, p.datePaiement.annee, p.idContrat, p.idGestionnaire);
@@ -125,36 +125,10 @@ void enregistrementPaiement() {
     file = fopen("paiement.bin", "ab");
     if (file == NULL) {
         printf("Erreur lors de l'ouverture du fichier paiement.bin.\n");
-        Sleep(2000);
-        system("cls");
-        accueilAdministrateur();
         return;
     }
     fseek(file, 0, SEEK_CUR);
     fwrite(&p, sizeof(PAIEMENT), 1, file);
-    fclose(file);
-
-    // Mettre à jour la valeur de c.dejaPayer dans contrat.bin
-    file = fopen("contrat.bin", "r+b");
-    if (file == NULL) {
-        printf("Erreur lors de l'ouverture du fichier contrat.bin.\n");
-        Sleep(2000);
-            system("cls");
-            accueilAdministrateur();
-        return;
-    }
-
-    CONTRAT c;
-
-    while (fread(&c, sizeof(CONTRAT), 1, file) == 1) {
-        if (strcmp(c.id, p.idContrat) == 0) {
-
-            fseek(file, -sizeof(CONTRAT), SEEK_CUR);
-            fwrite(&c, sizeof(CONTRAT), 1, file);
-            break;
-        }
-    }
-
     fclose(file);
 
     printf("\nLe paiement a ete ajoute avec succes.\n");
@@ -164,8 +138,26 @@ void enregistrementPaiement() {
 
 
 
+int verifierPaiementExistant(const char* idContrat, int mois, int annee) {
+    FILE* fichierPaiement = fopen("paiement.bin", "rb");
 
+    if (fichierPaiement == NULL) {
+        printf("Erreur lors de l'ouverture du fichier paiement.bin.\n");
+        return 0;
+    }
 
+    PAIEMENT p;
+
+    while (fread(&p, sizeof(PAIEMENT), 1, fichierPaiement) == 1) {
+        if (strcmp(p.idContrat, idContrat) == 0 && p.datePaiement.mois == mois && p.datePaiement.annee == annee) {
+            fclose(fichierPaiement);
+            return 1; // Paiement existant trouvé pour le contrat et le mois donnés
+        }
+    }
+
+    fclose(fichierPaiement);
+    return 0; // Aucun paiement existant pour le contrat et le mois donnés
+}
 
 void copieIdContrat(char id1[], char id2[], char id3[]) {
     FILE* file = fopen("contrat.bin", "r+b");
@@ -197,7 +189,7 @@ void copieIdContrat(char id1[], char id2[], char id3[]) {
 
 
 void afficherMenuContrat2() {
-    /*FILE* file = fopen("contrat.bin", "rb");
+    FILE* file = fopen("contrat.bin", "rb");
     if (file == NULL) {
         printf("Erreur lors de l'ouverture du fichier.\n");
         return;
@@ -211,7 +203,7 @@ void afficherMenuContrat2() {
 
     while (fread(&c, sizeof(CONTRAT), 1, file) == 1) {
         //AFFICHER UNIQUEMENT LES CONTRATS EN COURS
-        if(c.date_FIN.jours==0 && c.date_FIN.mois==0 && c.date_FIN.annee==0){
+        if((c.modifie){
             printf("%d. %s\n", index, c.id);
             index++;
         }
@@ -220,68 +212,6 @@ void afficherMenuContrat2() {
     printf("0. Accueil\n");
     printf("==========================\n");
 
-    fclose(file);*/
-    int verif=0;
-    FILE* fileContrat = fopen("contrat.bin", "rb");
-    if (fileContrat == NULL) {
-        printf("Erreur lors de l'ouverture du fichier contrat.bin.\n");
-        return ;
-    }
-
-    CONTRAT c;
-
-    int index = 0;
-
-    // Parcourir tous les enregistrements du fichier contrat.bin
-    while (fread(&c, sizeof(CONTRAT), 1, fileContrat) == 1) {
-        FILE* filePaiement = fopen("paiement.bin", "rb");
-        if (filePaiement == NULL) {
-            printf("Erreur lors de l'ouverture du fichier paiement.bin.\n");
-            Sleep(2000);
-            system("cls");
-            accueilAdministrateur();
-            fclose(fileContrat);
-        }
-
-        PAIEMENT p;
-
-        // Vérifier si l'ID du contrat correspond à un enregistrement dans le fichier paiement.bin
-        while (fread(&p, sizeof(PAIEMENT), 1, filePaiement) != 1) {
-            printf("idContrat %s id %s\n",p.id,c.id);
-            if (strcmp(p.idContrat, c.id) != 0) {
-                verif=1;
-                break;
-            }
-        }
-        if(c.modifie==0 && verif==0){
-            index++;
-            printf("%d. ID : %s\n", index, c.id);
-
-        }
-
-        fclose(filePaiement);
-    }
-
-}
-int verifierPaiementExistant(const char* idContrat, int mois, int annee) {
-    FILE* fichierPaiement = fopen("paiement.bin", "rb");
-
-    if (fichierPaiement == NULL) {
-        printf("Erreur lors de l'ouverture du fichier paiement.bin.\n");
-        return 0;
-    }
-
-    PAIEMENT p;
-
-    while (fread(&p, sizeof(PAIEMENT), 1, fichierPaiement) == 1) {
-        if (strcmp(p.idContrat, idContrat) == 0 && p.datePaiement.mois == mois && p.datePaiement.annee == annee) {
-
-            fclose(fichierPaiement);
-            return 1; // Paiement existant trouvé pour le contrat et le mois donnés
-        }
-    }
-
-    fclose(fichierPaiement);
-    return 0; // Aucun paiement existant pour le contrat et le mois donnés
+    fclose(file);
 }
 

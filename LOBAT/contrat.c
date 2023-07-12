@@ -112,6 +112,7 @@ void ajouterContrat1() {
             printf("Liste des locations disponibles :\n");
             for (int i = 0; i < nbLocationsDisponibles; i++) {
                 printf("%d. %s\n", i + 1, locations[locationsDisponiblesIndex[i]].id);
+                printf("\tLibelle %s\n\tType Logement : %s\n\tAdresse : %s %s %s %s\n\tPrix : %f\n",locations[locationsDisponiblesIndex[i]].libelle,locations[locationsDisponiblesIndex[i]].typeLogement,locations[locationsDisponiblesIndex[i]].adresse.pays,locations[locationsDisponiblesIndex[i]].adresse.region,locations[locationsDisponiblesIndex[i]].adresse.departement,locations[locationsDisponiblesIndex[i]].adresse.commune,locations[locationsDisponiblesIndex[i]].prix);
             }
             printf("\n");
 
@@ -349,6 +350,7 @@ void ajouterContrat2(char idClient[]) {
 
     nouveauContrat.modifie = 0;
 
+
     // Demander la date de début du contrat
     do{
         printf("Saisir la Date de Debut du contrat au format JJ/MM/AAAA : ");
@@ -418,6 +420,7 @@ void afficherMenuContrat() {
         printf("%d. %s\n", index, c.id);
         index++;
     }
+
 
     printf("0. Accueil\n");
     printf("==========================\n");
@@ -574,25 +577,47 @@ int menuPaiement(){
 
 
 
-
+/*
 
 void afficher_informations_contrats() {
-    FILE* fichier = fopen("location.bin", "rb");
+    FILE* fichier = fopen("contrat.bin", "rb");
 
     if (fichier == NULL) {
         printf("Impossible d'ouvrir le fichier.\n");
         return;
     }
 
-    LOCATION l;
+    CONTRAT c;
 
     printf("Informations des locations :\n");
     printf("---------------------------\n");
 
-    while (fread(&l, sizeof(LOCATION), 1, fichier) == 1) {
-        printf("ID : %s\n", l.id);
-        printf("libelle : %s\n", l.libelle);
-        printf("ID Bailleur : %s\n", l.idBailleur);
+    while (fread(&c, sizeof(CONTRAT), 1, fichier) == 1) {
+        printf("ID : %s\n", c.id);
+        printf("dejaPAYER : %d\n", c.dejaPayer);
+        printf("MODIFIE : %d\n", c.modifie);
+        // Afficher les autres informations du contrat
+
+        printf("---------------------------\n");
+    }
+
+    fclose(fichier);
+    fichier = fopen("paiement.bin", "rb");
+
+    if (fichier == NULL) {
+        printf("Impossible d'ouvrir le fichier.\n");
+        return;
+    }
+
+    CONTRAT c;
+
+    printf("Informations des locations :\n");
+    printf("---------------------------\n");
+
+    while (fread(&c, sizeof(CONTRAT), 1, fichier) == 1) {
+        printf("ID : %s\n", c.id);
+        printf("dejaPAYER : %d\n", c.dejaPayer);
+        printf("MODIFIE : %d\n", c.modifie);
         // Afficher les autres informations du contrat
 
         printf("---------------------------\n");
@@ -600,6 +625,88 @@ void afficher_informations_contrats() {
 
     fclose(fichier);
 
+}*/
+
+
+void afficherContratClient() {
+    FILE* fichierContrats = fopen("contrat.bin", "rb");
+    FILE* fichierClients = fopen("client.bin", "rb");
+
+    if (fichierContrats == NULL || fichierClients == NULL) {
+        printf("Erreur lors de l'ouverture des fichiers.\n");
+        Sleep(2000);
+        system("cls");
+        accueilAdministrateur();
+        return;
+    }
+
+    // Lire le nombre de clients et de contrats dans les fichiers
+    int nbClients, nbContrats;
+    fread(&nbClients, sizeof(int), 1, fichierClients);
+    fread(&nbContrats, sizeof(int), 1, fichierContrats);
+
+    if (nbClients == 0 || nbContrats == 0) {
+        printf("Aucun client ou contrat trouvé.\n");
+        Sleep(2000);
+        system("cls");
+        accueilAdministrateur();
+        fclose(fichierContrats);
+        fclose(fichierClients);
+        return;
+    }
+
+    // Afficher la liste des clients disponibles
+    CLIENT* clients = (CLIENT*)malloc(nbClients * sizeof(CLIENT));
+    fread(clients, sizeof(CLIENT), nbClients, fichierClients);
+
+    printf("Liste des clients :\n");
+    for (int i = 0; i < nbClients; i++) {
+        printf("%d. %s\n", i + 1, clients[i].id);
+    }
+
+    // Demander à l'utilisateur de choisir l'index du client
+    int choixClient;
+    printf("Veuillez choisir l'index du client : ");
+    scanf("%d", &choixClient);
+
+    if (choixClient < 1 || choixClient > nbClients) {
+        printf("Index de client invalide.\n");
+        free(clients);
+        fclose(fichierContrats);
+        fclose(fichierClients);
+        return;
+    }
+
+    // Récupérer l'ID du client choisi
+    char idClient[20];
+    strcpy(idClient, clients[choixClient - 1].id);
+
+    // Afficher les informations du contrat lié au client
+    CONTRAT* contrats = (CONTRAT*)malloc(nbContrats * sizeof(CONTRAT));
+    fread(contrats, sizeof(CONTRAT), nbContrats, fichierContrats);
+
+    int contratTrouve = 0;
+
+    for (int i = 0; i < nbContrats; i++) {
+        if (strcmp(contrats[i].idClient, idClient) == 0) {
+            contratTrouve = 1;
+            printf("ID du contrat : %s\n", contrats[i].id);
+            printf("ID du contrat : %s\n", contrats[i].idClient);
+            printf("ID du contrat : %s\n", contrats[i].idGestionnaire);
+            printf("ID du contrat : %s\n", contrats[i].idLocation);
+            printf("ID du contrat : %d/%d/%d\n", contrats[i].date_DEB.jours,contrats[i].date_DEB.mois,contrats[i].date_DEB.annee);
+            printf("ID du contrat : %d/%d/%d\n", contrats[i].date_FIN.jours,contrats[i].date_FIN.mois,contrats[i].date_FIN.annee);
+            printf("ID du contrat : %s\n", contrats[i].modePaiement);
+            // Afficher les autres champs du contrat...
+        }
+    }
+
+    if (!contratTrouve) {
+        printf("Aucun contrat trouvé pour ce client.\n");
+    }
+
+    free(clients);
+    free(contrats);
+    fclose(fichierContrats);
+    fclose(fichierClients);
 }
-
-
