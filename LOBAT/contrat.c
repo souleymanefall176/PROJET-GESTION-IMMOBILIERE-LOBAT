@@ -185,6 +185,7 @@ void ajouterContrat1() {
                 estAnterieure = estDateAnterieure(nouveauContrat.date_DEB, dateActuelle);
                 if (estAnterieure) {
                     printf("La date saisie est anterieure a la date actuelle du systeme.\n");
+
                 }
             }while (estAnterieure);
             //printf("Saisir la Date de Debut du contrat au format JJ/MM/AAAA : ");

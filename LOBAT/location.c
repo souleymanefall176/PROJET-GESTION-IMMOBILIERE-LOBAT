@@ -181,7 +181,7 @@ void ajouterLocation2(char idClient[]){
         printf("Erreur lors de l'ouverture du fichier.\n");
 
     }
-    printf("Choisir un bailleur : ");
+    printf("Choisir un bailleur : \n");
     afficherMenuBailleur();
     do{
         printf("Choix : ");

@@ -214,13 +214,15 @@ void afficher_informations_contrats();
 int menuPaiement();
 void afficherMenuContrat();
 void faireChoixContrat(char[]);
-void afficherIdMenuModContrat(char[]);
+void afficherIdMenuModContrat(char[]);//POUR AFFICHER TOUS LES CONTRATS
 void modifierContrat(char[] );
+void afficherMenuContrat2();//POUR AFFICHER UNIQUEMENT LES CONTRATS EN COURS
 
 //PAIEMENT
 int incrementerPaiement();
-void copieIdContrat(char[],char[] );
+void copieIdContrat(char[],char[],char[]);
 void enregistrementPaiement();
+int verifierPaiementExistant(const char*, int, int);
 
 //PROTOTYPE LOBAT FIN
 
